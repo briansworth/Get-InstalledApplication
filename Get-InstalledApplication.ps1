@@ -1,3 +1,62 @@
+<#
+.SYNOPSIS
+Get installed applications on local and / or remote computer(s).
+
+.DESCRIPTION
+Get installed applications on local and / or remote computer(s). 
+
+.PARAMETER ComputerName
+The computer name(s) to query for installed applications.
+
+.PARAMETER Properties
+The properties to include when querying the registry keys for installed applications.
+
+.PARAMETER IdentifyingNumber
+The application Id for a given application. Generally in the form of a GUID. 
+
+.PARAMETER Name
+The name of the application to search for.  Wildcards are accepted.
+
+.PARAMETER Publisher
+Search for applications from a specific publisher. Wildcards are accepted.
+
+.EXAMPLE
+Get-InstalledApplication
+
+Description
+-----------
+Get full list of installed applications on the local system.
+
+.EXAMPLE
+Get-InstalledApplication -ComputerName Workstation01 -Name "Google Chrome"
+
+Description
+-----------
+Search for applications named Google Chrome on Workstation01
+
+.EXAMPLE
+Get-InstalledApplication -ComputerName Server1, Server2 -Publisher 'Microsoft*'
+
+Description
+-----------
+Search for all applications on Server1 & Server2 where the publisher name begins with 'Microsoft'.
+
+.EXAMPLE
+Get-InstalledApplication -ComputerName Server1, Server2 -Name '7-zip*' -Properties DisplayVersion, UninstallString, InstallDate
+
+Description
+-----------
+Search for applications on Server1 & Server2, where the name starts with 7-zip. 
+Also include the properties DisplayVersion, UninstallString, & InstallDate if they exist.
+
+.EXAMPLE
+Get-InstalledApplication -ComputerName server1,server2,server3 -IdentifyingNumber {5FCE6D76-F5DC-37AB-B2B8-22AB8CEDB1D4} -Properties *
+
+Description
+-----------
+Search for an application with an ID of 5FCE6D76-F5DC-37AB-B2B8-22AB8CEDB1D4 on Server1, Server2, & Server3. 
+Include all available properties.
+#>
 Function Get-InstalledApplication {
   [CmdletBinding()]
   Param(
