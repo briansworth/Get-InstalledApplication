@@ -80,13 +80,26 @@ Function Get-InstalledApplication {
     [String]$Publisher
   )
   Begin{
-    $regPath = @(
-      'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
-      'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
-    )
+    Function IsCpuX86 ([Microsoft.Win32.RegistryKey]$hklmHive){
+      $regPath='SYSTEM\CurrentControlSet\Control\Session Manager\Environment'
+      $key=$hklmHive.OpenSubKey($regPath)
+
+      $cpuArch=$key.GetValue('PROCESSOR_ARCHITECTURE')
+
+      if($cpuArch -eq 'x86'){
+        return $true
+      }else{
+        return $false
+      }
+    }
   }
   Process{
     foreach($computer in $computerName){
+      $regPath = @(
+        'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall',
+        'SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall'
+      )
+
       Try{
         $hive=[Microsoft.Win32.RegistryKey]::OpenRemoteBaseKey(
           [Microsoft.Win32.RegistryHive]::LocalMachine, 
@@ -95,6 +108,12 @@ Function Get-InstalledApplication {
         if(!$hive){
           continue
         }
+        
+        # if CPU is x86 do not query for Wow6432Node
+        if($IsCpuX86){
+          $regPath=$regPath[0]
+        }
+
         foreach($path in $regPath){
           $key=$hive.OpenSubKey($path)
           if(!$key){
